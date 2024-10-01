@@ -7,10 +7,18 @@ import self.training.schemas.dataSchemas
 import self.training.schemas.dataSchemas.{enriched_data, transaction}
 
 object enrich {
+
+  /**
+   * Enriches the transaction data by adding customer information and rules from the customer and rule datasets using common account_no
+   * @param transaction dataset of transactions
+   * @param customer dataset of customers
+   * @param rule dataset of rules
+   * @return dataset[enriched_data]
+   */
   def enrich(
               transaction: Dataset[transaction],
               customer: Broadcast[Map[Int, dataSchemas.customer]],
-              decline: Broadcast[Map[Int, dataSchemas.rule]]
+              rule: Broadcast[Map[Int, dataSchemas.rule]]
             ): Dataset[enriched_data] = {
 
     import transaction.sparkSession.implicits._
@@ -19,7 +27,7 @@ object enrich {
       customer.value.get(account_no))
 
     val getDeclineReasonUDF = udf((decline_code: Int) =>
-      decline.value.get(decline_code)
+      rule.value.get(decline_code)
     )
 
     transaction

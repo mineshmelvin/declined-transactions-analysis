@@ -1,8 +1,19 @@
 package self.training.schemas
 
+import org.apache.spark.sql.{Encoder, Encoders}
 import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructType}
+import self.training.schemas.dataSchemas.TargetType.TargetType
+import self.training.schemas.dataSchemas.AccountType.AccountType
+import self.training.schemas.dataSchemas.run_env.run_env
 
+/**
+ * Contains all the schemas required in the application to make it Strongly Typed
+ */
 object dataSchemas {
+
+  implicit val accountTypeEncoder: Encoder[AccountType] = Encoders.kryo[AccountType]
+  implicit val targetTypeEncoder: Encoder[TargetType] = Encoders.kryo[TargetType]
+  implicit val run_envEncoder: Encoder[run_env] = Encoders.kryo[run_env]
   case class transaction(
                              card_no: Int,
                              account_no: Int,
@@ -16,7 +27,7 @@ object dataSchemas {
   case class rule(
                    rule_id: Int,
                    rule_desc: String,
-                   account_type: CustomerType,
+                   account_type: AccountType,
                    target: TargetType,
                    decline_code: Int,
                    decline_reason: String
@@ -35,9 +46,9 @@ object dataSchemas {
   case class enriched_data(
                             id: Int,
                             name: String,
-                            account_type: String,
-                            account_no: String,
-                            card_no: String,
+                            account_type: AccountType,
+                            account_no: Int,
+                            card_no: Int,
                             email: String,
                             phone: String,
                             amount: Double,
@@ -46,13 +57,13 @@ object dataSchemas {
                             decline_code: Int,
                             decline_reason: String,
                             time: String,
-                            target: String
+                            target: TargetType
                           )
 
   case class amount_declined_per_account_type(
                                                start_time: String,
                                                end_time: String,
-                                               account_type: String,
+                                               account_type: AccountType,
                                                amount: Double
                                              )
 
@@ -64,7 +75,6 @@ object dataSchemas {
                                                )
 
   val transactionSchema: StructType = new StructType()
-    .add("card_no", StringType)
     .add("card_no", IntegerType)
     .add("account_no", IntegerType)
     .add("amount", DoubleType)
@@ -73,24 +83,37 @@ object dataSchemas {
     .add("merchant_id", IntegerType)
     .add("time", StringType)
 
-  val customerSchema = new StructType()
-    .add("account_no", StringType)
-    .add("customer_name", StringType)
-    .add("email", StringType)
-    .add("phone", StringType)
-    .add("customer_type", StringType)
+//  sealed trait AccountType
+//  case object VIP extends AccountType
+//  case object retail extends AccountType
+//  case object corporate extends AccountType
 
-  sealed trait CustomerType
-  case object VIP extends CustomerType
-  case object retail extends CustomerType
-  case object corporate extends CustomerType
+//  sealed trait run_env
+//  case object dev extends run_env
+//  case object prod extends run_env
 
-  sealed trait run_env
-  case object dev extends run_env
-  case object prod extends run_env
+//  sealed trait TargetType
+//  case object kafka extends TargetType
+//  case object mysql extends TargetType
+//  case object console extends TargetType
 
-  sealed trait TargetType
-  case object kafka extends TargetType
-  case object mysql extends TargetType
-  case object console extends TargetType
+  object TargetType extends Enumeration {
+    type TargetType = Value
+    val kafka, mysql, console = Value
+  }
+
+  object AccountType extends Enumeration {
+    type AccountType = Value
+    val retail, VIP, corporate = Value
+  }
+
+  object run_env extends Enumeration {
+    type run_env = Value
+    val prod, dev = Value
+  }
+
+  object AccountTypeEncoders {
+    implicit def accountTypeEncoder: org.apache.spark.sql.Encoder[AccountType] =
+      org.apache.spark.sql.Encoders.kryo[AccountType]
+  }
 }

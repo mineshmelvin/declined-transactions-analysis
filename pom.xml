@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>self.training</groupId>
-  <artifactId>radar_replica</artifactId>
+  <artifactId>decline_transaction_analysis</artifactId>
   <version>1.0</version>
   <name>${project.artifactId}</name>
-  <description>RADAR - replica</description>
+  <description>Declined Transactions Analysis</description>
   <inceptionYear>2010</inceptionYear>
   <licenses>
     <license>
@@ -93,14 +93,23 @@
 <!--    </dependency>-->
     <dependency>
       <groupId>org.scalatest</groupId>
-      <artifactId>scalatest</artifactId>
-      <version>1.2</version>
+      <artifactId>scalatest_2.11</artifactId>
+      <version>3.2.9</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>4.11.0</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
     <sourceDirectory>src/main/scala</sourceDirectory>
+    <testSourceDirectory>src/test/scala</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.scala-tools</groupId>

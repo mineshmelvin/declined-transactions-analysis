@@ -3,21 +3,44 @@ package self.training.data
 import org.apache.spark.sql.execution.streaming.MemoryStream
 import org.apache.spark.sql.streaming.StreamingQueryListener
 import org.apache.spark.sql.{Dataset, SQLContext, SparkSession}
-import self.training.schemas.dataSchemas.{VIP, corporate, customer, retail, rule, transaction, kafka, console, mysql}
+import self.training.schemas.dataSchemas.{customer, rule, transaction}
+import self.training.schemas.dataSchemas.TargetType.{kafka, console, mysql}
+import self.training.schemas.dataSchemas.AccountType.{VIP, corporate, retail}
 
 import java.time.Instant
 import scala.util.Random
 
+/**This object contains functions and hardcoded customer information to simulate generation of customers,
+transactions, and rules for testing purpose */
+
 object sample_data {
+  /**
+   *
+   * @param spark: SparkSession to  create a Dataset
+   * @return Dataset[customer] of randomly generated customers for testing purpose
+   */
   def generate_customer_data(spark: SparkSession):Dataset[customer] = {
     import spark.implicits._
     customers.toDS()
   }
 
+  /**
+   *
+   * @param spark : SparkSession to  create a Dataset
+   * @return Dataset[rule] of randomly generated rules for testing purpose
+   */
+
   def generate_rules(spark: SparkSession): Dataset[rule] = {
     import spark.implicits._
     rules.toDS()
   }
+
+  /**
+   *
+   * @param spark : SparkSession to  create a Dataset
+   * @param numTransaction: the number of transactions to be produced
+   * @return Dataset[customer] of randomly generated transactions for testing purpose
+   */
 
   def generate_transaction_data(spark: SparkSession, numTransaction: Int): Dataset[transaction] = {
     import spark.implicits._
@@ -44,9 +67,10 @@ object sample_data {
     transactionStream.toDS().as[transaction]
   }
 
+  // Hardcoded sample customers
   private val customers: Seq[customer] = Seq(
-    customer(1, "Minesh", "8310865183", "mineshmelvin@gmail.com", "VIP", 1234, 1111),
-    customer(2, "Fuedal", "7411981298", "fuedalpearl@gmail.com", "VIP", 2345, 2222),
+    customer(1, "Minesh", "6345223554", "minesh@gmail.com", "VIP", 1234, 1111),
+    customer(2, "Fuedal", "2435535422", "fuedal@gmail.com", "VIP", 2345, 2222),
     customer(3, "Bibin", "8765773829", "bibinmark@gmail.com", "retail", 4532, 3333),
     customer(4, "Nishil", "6573293030", "nishilstephan@gmail.com", "corporate", 3456, 4444),
     customer(5, "Rocco", "9876492920", "rocco@gmail.com", "retail", 4674, 5555),
@@ -56,6 +80,7 @@ object sample_data {
     customer(9, "Sadiq", "5362890200", "sadiq@gmail.com", "retail", 2355, 9999)
   )
 
+  // Hardcoded sample rules
   private val rules: Seq[rule] = Seq(
     rule(1, "write retail transactions with decline_code 101 to kafka", retail, kafka, 101, "invalid_pin"),
     rule(2, "write VIP transactions with decline_code 101 to MySQL", VIP, mysql, 101, "invalid_pin"),
